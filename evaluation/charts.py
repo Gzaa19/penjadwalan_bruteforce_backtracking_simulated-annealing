@@ -1,4 +1,5 @@
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 matplotlib.rcParams['figure.max_open_warning'] = 50
@@ -121,7 +122,6 @@ def create_charts(all_results, scenarios):
 
     plt.tight_layout()
     plt.savefig("grafik_perbandingan_algoritma.png", dpi=150, bbox_inches='tight')
-    plt.show()
 
     print("\n[GRAFIK] Grafik disimpan sebagai 'grafik_perbandingan_algoritma.png'")
 
@@ -150,6 +150,5 @@ def create_charts(all_results, scenarios):
 
     plt.tight_layout()
     plt.savefig("grafik_slot_malam.png", dpi=150, bbox_inches='tight')
-    plt.show()
 
     print("[GRAFIK] Grafik slot malam disimpan sebagai 'grafik_slot_malam.png'")
