@@ -36,6 +36,7 @@ def run_experiments():
                 "explored": 0,
                 "time": 0.0,
                 "found_solution": False,
+                "skipped": True,
             }
         else:
             bf_result = brute_force_schedule(
@@ -68,6 +69,7 @@ def run_experiments():
                 "explored": 0,
                 "time": 0.0,
                 "found_solution": False,
+                "skipped": True,
             }
         else:
             bt_result = backtracking_schedule(

@@ -1,6 +1,5 @@
 # Hari yang tersedia untuk penjadwalan praktikum
 days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
-
 # Rentang waktu yang tersedia
 # Format: (jam_mulai, jam_selesai, apakah_slot_malam)
 time_ranges = [
@@ -11,7 +10,6 @@ time_ranges = [
     ("15:40", "17:40", False),   # Sore
     ("18:15", "20:15", True),    # Malam (penalti)
 ]
-
 def build_all_slots():
     slots = []
     slot_id = 0
@@ -26,6 +24,5 @@ def build_all_slots():
             })
             slot_id += 1
     return slots
-
 # Daftar semua slot waktu (30 slot total: 5 hari × 6 rentang waktu)
 all_slots = build_all_slots()

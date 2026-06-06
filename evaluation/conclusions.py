@@ -84,7 +84,7 @@ def display_conclusions(all_results, scenarios):
         "   - Lebih efisien daripada brute force berkat mekanisme pruning.",
         "   - Memotong cabang pencarian yang pasti melanggar constraint.",
         "   - Jumlah konfigurasi yang dieksplorasi jauh lebih sedikit.",
-        "   - Masih menjamin solusi optimal dalam ruang yang dipangkas.",
+        "   - Backtracking dapat menjamin solusi optimal apabila seluruh ruang pencarian selesai dieksplorasi. Namun pada eksperimen ini, karena diterapkan batas waktu, hasil Backtracking dianggap sebagai solusi terbaik yang ditemukan dalam batas waktu tersebut.",
         "   - Cocok untuk skenario sedang hingga sulit.",
         "",
         "3. SIMULATED ANNEALING:",
@@ -94,6 +94,10 @@ def display_conclusions(all_results, scenarios):
         "   - Waktu eksekusi relatif konsisten dan dapat dikontrol.",
         "   - Mekanisme penerimaan solusi buruk membantu keluar dari local optima.",
         "   - Paling cocok untuk skenario besar/ekstrem dalam aplikasi nyata.",
+        "",
+        "4. ASUMSI & PENJELASAN PENGUJIAN:",
+        "   - Seluruh algoritma berhasil menghindari slot malam pada solusi terbaik, sehingga nilai penggunaan slot malam adalah 0 pada semua skenario.",
+        "   - Beberapa kelas dapat berada pada slot waktu yang sama selama pasangan asistennya berbeda dan tidak ada konflik jadwal, karena kapasitas ruang/laboratorium tidak dimodelkan."
     ]
 
     for line in conclusions:

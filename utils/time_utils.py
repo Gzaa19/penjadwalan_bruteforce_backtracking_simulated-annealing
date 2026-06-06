@@ -4,7 +4,6 @@ def time_to_minutes(time_str):
     minutes = int(parts[1])
     return hours * 60 + minutes
 
-
 def format_slot(slot):
     night_marker = " [MALAM]" if slot.get("is_night", False) else ""
     return f"{slot['day']} {slot['start']}-{slot['end']}{night_marker}"

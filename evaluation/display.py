@@ -30,17 +30,18 @@ def display_results_table(all_results):
 
     for result in all_results:
         stats = result["stats"]
+        is_skipped = result.get("skipped", False)
 
         rows.append({
             "Skenario": result["scenario"],
             "Algoritma": result["algorithm"],
-            "Jadwal Valid": "✓ Ya" if stats["is_valid"] else "✗ Tidak",
-            "Pelanggaran HC": stats["hard_violations"],
-            "Cost": f"{result['cost']:.2f}" if result['cost'] != float('inf') else "∞",
-            "Konfigurasi Dieksplorasi": f"{result['explored']:,}",
-            "Waktu (detik)": f"{result['time']:.4f}",
-            "Slot Malam": stats["night_slots"],
-            "Kelas Terjadwal": f"{stats['scheduled_count']}/{stats['total_classes']}",
+            "Jadwal Valid": "Diskip / Tidak dijalankan" if is_skipped else ("✓ Ya" if stats["is_valid"] else "✗ Tidak"),
+            "Pelanggaran HC": "-" if is_skipped else stats["hard_violations"],
+            "Cost": "Diskip / Tidak dijalankan" if is_skipped else (f"{result['cost']:.2f}" if result['cost'] != float('inf') else "∞"),
+            "Konfigurasi Dieksplorasi": "-" if is_skipped else f"{result['explored']:,}",
+            "Waktu (detik)": "-" if is_skipped else f"{result['time']:.4f}",
+            "Slot Malam": "-" if is_skipped else stats["night_slots"],
+            "Kelas Terjadwal": "-" if is_skipped else f"{stats['scheduled_count']}/{stats['total_classes']}",
         })
 
     df = pd.DataFrame(rows)

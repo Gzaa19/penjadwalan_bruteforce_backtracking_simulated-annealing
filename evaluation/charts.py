@@ -1,3 +1,4 @@
+import math
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -27,10 +28,16 @@ def create_charts(all_results, scenarios):
 
     for result in all_results:
         algo = result["algorithm"]
-        data[algo]["time"].append(result["time"])
-        cost_val = result["cost"] if result["cost"] != float('inf') else 0
+        is_skipped = result.get("skipped", False)
+        
+        # Gunakan nan agar matplotlib tidak menggambar bar untuk algoritma yang tidak dijalankan/diskip
+        cost_val = float('nan') if (is_skipped or result["cost"] == float('inf')) else result["cost"]
+        time_val = float('nan') if is_skipped else result["time"]
+        explored_val = float('nan') if is_skipped else result["explored"]
+        
+        data[algo]["time"].append(time_val)
         data[algo]["cost"].append(cost_val)
-        data[algo]["explored"].append(result["explored"])
+        data[algo]["explored"].append(explored_val)
 
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     fig.suptitle("Perbandingan Performa Algoritma Penjadwalan ALPRO",
@@ -48,7 +55,7 @@ def create_charts(all_results, scenarios):
                        edgecolor='white', linewidth=0.5)
         for bar_item in bars:
             height = bar_item.get_height()
-            if height > 0:
+            if not math.isnan(height) and height > 0:
                 ax1.text(bar_item.get_x() + bar_item.get_width() / 2., height,
                          f'{height:.2f}s',
                          ha='center', va='bottom', fontsize=7)
@@ -71,7 +78,7 @@ def create_charts(all_results, scenarios):
                        edgecolor='white', linewidth=0.5)
         for bar_item in bars:
             height = bar_item.get_height()
-            if height > 0:
+            if not math.isnan(height):
                 ax2.text(bar_item.get_x() + bar_item.get_width() / 2., height,
                          f'{height:.0f}',
                          ha='center', va='bottom', fontsize=7)
@@ -131,7 +138,9 @@ def create_charts(all_results, scenarios):
     night_data = {algo: [] for algo in algorithms}
     for result in all_results:
         algo = result["algorithm"]
-        night_data[algo].append(result["stats"]["night_slots"])
+        is_skipped = result.get("skipped", False)
+        night_val = float('nan') if is_skipped else result["stats"]["night_slots"]
+        night_data[algo].append(night_val)
 
     for i, algo in enumerate(algorithms):
         offset = (i - 1) * bar_width
@@ -145,6 +154,7 @@ def create_charts(all_results, scenarios):
                   fontsize=13, fontweight='bold')
     ax5.set_xticks(x)
     ax5.set_xticklabels(scenario_names)
+    ax5.set_ylim(0, 1.2)
     ax5.legend(fontsize=9)
     ax5.grid(axis='y', alpha=0.3)
 
