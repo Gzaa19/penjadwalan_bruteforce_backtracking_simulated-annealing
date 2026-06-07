@@ -1,0 +1,13 @@
+Skenario,Algoritma,Jadwal Valid,Pelanggaran HC,Cost,Konfigurasi Dieksplorasi,Waktu (detik),Slot Malam,Kelas Terjadwal
+Mudah,Brute Force,✓ Ya,0,0.00,"2,985,984",23.6182,0,3/3
+Mudah,Backtracking,✓ Ya,0,0.00,"1,039,896",8.1359,0,3/3
+Mudah,Simulated Annealing,✓ Ya,0,0.00,"2,297",0.0748,0,3/3
+Sedang,Brute Force,Diskip / Tidak dijalankan,-,Diskip / Tidak dijalankan,-,-,-,-
+Sedang,Backtracking,✓ Ya,0,0.00,"9,725,883",120.0001,0,6/6
+Sedang,Simulated Annealing,✓ Ya,0,14.70,"2,297",0.1422,0,6/6
+Sulit,Brute Force,Diskip / Tidak dijalankan,-,Diskip / Tidak dijalankan,-,-,-,-
+Sulit,Backtracking,✓ Ya,0,0.00,"8,726,563",120.0004,0,9/9
+Sulit,Simulated Annealing,✓ Ya,0,14.70,"2,297",0.2174,0,9/9
+Ekstrem,Brute Force,Diskip / Tidak dijalankan,-,Diskip / Tidak dijalankan,-,-,-,-
+Ekstrem,Backtracking,Diskip / Tidak dijalankan,-,Diskip / Tidak dijalankan,-,-,-,-
+Ekstrem,Simulated Annealing,✓ Ya,0,0.00,"2,297",0.2993,0,12/12

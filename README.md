@@ -17,7 +17,7 @@ Dokumentasi penelitian dan implementasi kode program untuk perbandingan performa
 Penjadwalan mata kuliah atau praktikum di perguruan tinggi merupakan salah satu varian dari *University Course Timetabling Problem* (UCTP) yang tergolong ke dalam masalah optimasi kombinatorial berkategori **NP-Hard**. Masalah menjadi lebih kompleks pada praktikum Algoritma dan Pemrograman (ALPRO) karena setiap kelas praktikum harus diampu oleh **dua asisten praktikum berpasangan** yang tidak boleh memiliki bentrok jadwal dengan kuliah mereka sendiri maupun kuliah para praktikan semester 2.
 
 Penelitian ini membandingkan tiga pendekatan algoritma:
-1. **Brute Force** (Pencarian Exhaustive) - Mengeksplorasi seluruh ruang solusi untuk menjamin pencarian solusi optimal global, namun memiliki kompleksitas waktu eksponensial $\mathcal{O}((|S| \times |P|)^{|C|})$.
+1. **Brute Force** (Pencarian Exhaustive) - Mengeksplorasi seluruh ruang solusi untuk menjamin pencarian solusi optimal global, namun memiliki kompleksitas waktu eksponensial O((S * P)^C).
 2. **Backtracking** (Pencarian Berbasis Pohon dengan Pruning) - Melakukan penelusuran secara *depth-first search* dengan memotong (*pruning*) cabang pencarian yang tidak layak sejak dini berdasarkan pemenuhan *hard constraints*.
 3. **Simulated Annealing** (Metaheuristik Probabilistik) - Memodelkan proses pendinginan logam untuk melompat keluar dari jebakan *local optima* melalui penerimaan solusi yang lebih buruk dengan probabilitas tertentu berdasarkan temperatur sistem.
 
@@ -28,32 +28,27 @@ Pengujian dilakukan dalam empat skenario dengan tingkat kompleksitas yang mening
 ## Pemodelan Matematika & Batasan Masalah
 
 ### 1. Definisi Himpunan & Konstanta
-* $C$: Himpunan kelas praktikum ALPRO (12 kelas: ALPRO A1 s.d. F2).
-* $S$: Himpunan slot waktu (30 slot waktu: 5 hari kerja $\times$ 6 rentang waktu).
-* $A$: Himpunan asisten praktikum (6 asisten).
-* $P$: Himpunan pasangan asisten berpasangan, dengan $|P| = \binom{|A|}{2} = \frac{|A|(|A|-1)}{2} = 15$ pasangan unik.
+* Himpunan kelas praktikum ALPRO `C` (12 kelas: ALPRO A1 s.d. F2).
+* Himpunan slot waktu `S` (30 slot waktu: 5 hari kerja x 6 rentang waktu).
+* Himpunan asisten praktikum `A` (6 asisten).
+* Himpunan pasangan asisten berpasangan `P`, dengan jumlah P = A * (A - 1) / 2 = 15 pasangan unik.
 
 ### 2. Variabel Keputusan
-Jadwal dimodelkan sebagai variabel biner $x_{i,s,p}$ di mana:
-$$
-x_{i,s,p} = 
-\begin{cases} 
-1, & \text{jika kelas } i \in C \text{ ditempatkan pada slot } s \in S \text{ dengan pasangan asisten } p \in P \\
-0, & \text{lainnya}
-\end{cases}
-$$
+Jadwal dimodelkan sebagai variabel keputusan biner `x(i, s, p)` di mana:
+* `x(i, s, p) = 1`, jika kelas praktikum `i` (dalam `C`) dijadwalkan pada slot waktu `s` (dalam `S`) dengan diampu oleh pasangan asisten `p` (dalam `P`).
+* `x(i, s, p) = 0`, jika lainnya (tidak dijadwalkan).
 
 Setiap kelas praktikum harus mendapatkan tepat satu slot waktu dan satu pasangan asisten:
-$$
-\sum_{s \in S} \sum_{p \in P} x_{i,s,p} = 1, \quad \forall i \in C
-$$
+```text
+Jumlah_s_dalam_S( Jumlah_p_dalam_P( x(i, s, p) ) ) = 1,  untuk setiap i dalam C
+```
 
 ### 3. Batasan Masalah (Constraints)
 
 #### A. Hard Constraints (Wajib Dipenuhi)
 1. **Bentrok Kuliah Praktikan**: Slot waktu praktikum tidak boleh bertabrakan dengan jadwal kuliah wajib mahasiswa semester 2 (praktikan).
 2. **Bentrok Kuliah Asisten**: Slot waktu praktikum tidak boleh bertabrakan dengan jadwal kuliah asisten praktikum yang bertugas (mahasiswa semester 4).
-3. **Batas Beban Asisten**: Setiap asisten tidak boleh mengampu lebih dari batas maksimal kelas ($MaxLoad = 4$ kelas).
+3. **Batas Beban Asisten**: Setiap asisten tidak boleh mengampu lebih dari batas maksimal kelas (MaxLoad = 4 kelas).
 4. **Bentrok Tugas Asisten**: Seorang asisten tidak boleh mengampu lebih dari satu kelas praktikum pada slot waktu yang saling beririsan (*overlapping*).
 5. **Slot Waktu Terlarang**: Slot Senin s.d. Rabu pukul 07.00 - 09.40 ditetapkan sebagai slot terlarang karena dialokasikan untuk kegiatan akademis lainnya.
 
@@ -63,15 +58,16 @@ $$
 
 ### 4. Fungsi Objektif (Cost Function)
 Kualitas jadwal dinilai berdasarkan fungsi biaya berikut (semakin rendah nilai cost, semakin baik kualitas jadwal):
-$$
-F(x) = W_h \cdot H(x) + W_m \cdot M(x) + W_b \cdot B(x) + W_u \cdot U(x)
-$$
+
+```text
+F(x) = Wh * H(x) + Wm * M(x) + Wb * B(x) + Wu * U(x)
+```
 
 Dimana:
-* $H(x)$: Jumlah pelanggaran *hard constraints* (Penalti $W_h = 10.000$).
-* $M(x)$: Jumlah kelas yang menggunakan slot malam (Penalti $W_m = 50$).
-* $B(x)$: Deviasi standar distribusi beban asisten (Penalti $W_b = 30$).
-* $U(x)$: Jumlah kelas praktikum yang gagal dijadwalkan (Penalti $W_u = 5.000$).
+* `H(x)`: Jumlah pelanggaran hard constraints (dengan bobot penalti Wh = 10.000).
+* `M(x)`: Jumlah kelas yang dijadwalkan pada slot malam (dengan bobot penalti Wm = 50).
+* `B(x)`: Deviasi standar (std dev) distribusi beban mengajar antar asisten (dengan bobot penalti Wb = 30).
+* `U(x)`: Jumlah kelas praktikum yang tidak berhasil dijadwalkan (dengan bobot penalti Wu = 5.000).
 
 ---
 
@@ -79,12 +75,12 @@ Dimana:
 
 Eksperimen dirancang ke dalam 4 tingkatan skenario untuk menguji kinerja komputasi dan skalabilitas algoritma:
 
-| Skenario | Jumlah Kelas ($|C|$) | Jumlah Slot Valid ($|S|$) | Jumlah Asisten ($|A|$) | Jumlah Pasangan ($|P|$) | Ruang Solusi Teoritis ($(|S| \times |P|)^{|C|}$) |
+| Skenario | Jumlah Kelas (C) | Jumlah Slot Valid (S) | Jumlah Asisten (A) | Jumlah Pasangan (P) | Ruang Solusi Teoritis ((S * P)^C) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Mudah** | 3 kelas | 24 slot | 4 asisten | 6 pasangan | $144^3 = 2,98 \times 10^6$ |
-| **Sedang** | 6 kelas | 24 slot | 5 asisten | 10 pasangan | $240^6 = 1,91 \times 10^{14}$ |
-| **Sulit** | 9 kelas | 24 slot | 6 asisten | 15 pasangan | $360^9 = 1,01 \times 10^{23}$ |
-| **Ekstrem**| 12 kelas | 21 slot | 6 asisten | 15 pasangan | $315^{12} = 1,46 \times 10^{30}$ |
+| **Mudah** | 3 kelas | 24 slot | 4 asisten | 6 pasangan | 144^3 = 2,98 x 10^6 |
+| **Sedang** | 6 kelas | 24 slot | 5 asisten | 10 pasangan | 240^6 = 1,91 x 10^14 |
+| **Sulit** | 9 kelas | 24 slot | 6 asisten | 15 pasangan | 360^9 = 1,01 x 10^23 |
+| **Ekstrem**| 12 kelas | 21 slot | 6 asisten | 15 pasangan | 315^12 = 1,46 x 10^30 |
 
 ---
 
@@ -118,6 +114,16 @@ Berikut adalah data hasil eksekusi program perbandingan algoritma pada sistem ko
 1. **Brute Force**: Hanya mampu menyelesaikan skenario Mudah dengan mengeksplorasi seluruh kombinasi secara mendalam. Tidak praktis untuk penjadwalan dunia nyata akibat ledakan kombinatorial.
 2. **Backtracking**: Sangat unggul dalam menemukan solusi dengan kualitas terbaik (Cost = 0.00) pada skenario menengah berkat mekanisme pemangkasan cabang tidak layak. Namun, ketika ruang solusi meningkat tajam (skenrio Ekstrem), algoritma kehabisan waktu sebelum berhasil menyelesaikan pencarian atau melakukan *backtrack* penuh.
 3. **Simulated Annealing**: Merupakan algoritma paling andal dan skalabel untuk permasalahan praktis ini. SA mampu menghasilkan solusi jadwal yang sepenuhnya valid (tidak ada bentrok dan melanggar aturan) pada seluruh skenario termasuk skenario terberat (Ekstrem, 12 kelas) hanya dalam waktu **0.2993 detik** dan mengeksplorasi iterasi yang sangat minimal.
+
+### 3. Visualisasi Grafik Perbandingan Performa
+
+Berikut adalah grafik visualisasi hasil perbandingan performa algoritma yang dihasilkan langsung oleh program:
+
+#### Grafik Perbandingan Performa Umum (Waktu Eksekusi, Cost, Eksplorasi, & Konvergensi SA)
+![Grafik Perbandingan Algoritma](grafik_perbandingan_algoritma.png)
+
+#### Grafik Penggunaan Slot Malam (Soft Constraint)
+![Grafik Slot Malam](grafik_slot_malam.png)
 
 ---
 
